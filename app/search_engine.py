@@ -47,7 +47,7 @@ class SearchEngine:
         queue = list()
         # query index, content index, is continuous
         queue.append((0, 1, False))
-        
+        num_result = 0 
         while (len(queue) > 0):
             status = queue.pop(0)
             query_index = status[0]
@@ -55,7 +55,13 @@ class SearchEngine:
             is_continuos = status[2]
 
             if query_index >= len(query):
-                return True
+                # print(content_index)
+                num_result += 1 
+                continue
+
+            if query[query_index] == '*':
+                queue.append((query_index + 1, content_index, False))
+                continue
 
             if content_index >= len(doc_content):
                 continue
@@ -63,10 +69,6 @@ class SearchEngine:
             max_len = len(doc_content)
             if is_continuos == True:
                 max_len = content_index + 1
-
-            if query[query_index] == '*':
-                queue.append((query_index + 1, content_index, False))
-                continue
 
             if query[query_index] == '?':
                 for l_index in range(content_index, max_len):
@@ -79,7 +81,7 @@ class SearchEngine:
 
             len_query = len(query[query_index])
 
-            for l_index in range(content_index, max_len):
+            for l_index in range(content_index, max_len + 1):
                 r_index = len_query + l_index - 1
                 if r_index > len(doc_content) - 1:
                     break
@@ -89,7 +91,7 @@ class SearchEngine:
                 if hash_lr == hash_query:
                     queue.append((query_index + 1, r_index + 1, True))
         
-        return False
+        return num_result
      
     def readContent(self, directory):
         file_handler = open(directory, 'r', encoding='utf-8')
@@ -126,17 +128,24 @@ class SearchEngine:
     def __call__(self, search_query):
         global query
         query = self.processingQuery(search_query=search_query)
-        
+        # print(query)
         query_in_page = list()
         for file in self.file_dir:
-            dir, is_in_page = self.searchPerDocument(file)
-            if is_in_page == True:
-                query_in_page.append(dir)
+            dir, num_results = self.searchPerDocument(file)
+            if num_results > 0:
+                query_in_page.append([dir, num_results])
 
         return query_in_page
 
     
-   
+# engine = SearchEngine()
+# results = engine('*a*')
+# total_results = 0
+# print(results)
+# for result in results:
+#     total_results += result[1]
+
+# print('Total: ',total_results)
 
     
 

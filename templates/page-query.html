@@ -10,10 +10,10 @@
     <h2>Your search query is: {{search_query}}</h2>
     <div>
         <p>{{msg}}</p>
-        {% for dir, cont in content.items() %}
-            <h3 style="text-align:center">{{dir}}</h3>
+        {% for dir, num_result in content %}
+            <h3>{{dir}}</h3>
 
-            <p>{{cont}}</p>
+            <p>There are {{num_result}} in this page</p>
         {% endfor %} 
     </div>
 </body>
